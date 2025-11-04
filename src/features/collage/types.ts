@@ -1,4 +1,12 @@
-export type CollageLayoutId = 'two-up' | 'three-stack' | 'grid-2x2' | 'mosaic';
+export type CollageLayoutId =
+  | 'two-up'
+  | 'two-stack'
+  | 'three-stack'
+  | 'three-column'
+  | 'grid-2x2'
+  | 'feature-left'
+  | 'featured-center'
+  | 'mosaic';
 
 export interface LayoutCell {
   /** Normalized x coordinate between 0 and 1 */
