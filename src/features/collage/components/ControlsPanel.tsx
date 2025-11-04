@@ -7,7 +7,7 @@ import { COLLAGE_LAYOUTS, LAYOUT_OPTIONS } from '../layouts'
 const formatLabel = (value: number) => `${value}px`
 
 export const ControlsPanel = () => {
-  const { settings, updateSettings } = useCollage()
+  const { settings, updateSettings, images, shuffleImages } = useCollage()
 
   const handleLayoutChange = (id: string) => {
     if (id === settings.layoutId) return
@@ -59,6 +59,15 @@ export const ControlsPanel = () => {
             )
           })}
         </div>
+        {images.length > 1 && (
+          <button
+            type="button"
+            onClick={shuffleImages}
+            className="mt-3 w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Randomize layout
+          </button>
+        )}
       </div>
 
       <div>

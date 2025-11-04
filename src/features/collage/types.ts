@@ -65,6 +65,7 @@ export interface CollageContextValue extends CollageState {
   removeImage: (id: string) => void;
   clearImages: () => void;
   reorderImages: (fromIndex: number, toIndex: number) => void;
+  shuffleImages: () => void;
   updateSettings: (partial: Partial<CollageSettings>) => void;
   setImageFocus: (id: string, focus: { focusX?: number; focusY?: number }) => void;
 }
