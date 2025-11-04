@@ -225,6 +225,24 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
     })
   }, [])
 
+  const shuffleImages = useCallback(() => {
+    setState((prev) => {
+      if (prev.images.length <= 1) return prev
+
+      const shuffled = [...prev.images]
+      // Fisher-Yates shuffle algorithm
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+
+      return {
+        ...prev,
+        images: shuffled,
+      }
+    })
+  }, [])
+
   const updateSettings = useCallback((partial: Partial<CollageSettings>) => {
     setState((prev) => {
       const nextSettings = { ...prev.settings, ...partial }
@@ -282,6 +300,7 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
       removeImage,
       clearImages,
       reorderImages,
+      shuffleImages,
       updateSettings,
       setImageFocus,
     }),
@@ -293,6 +312,7 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
       removeImage,
       clearImages,
       reorderImages,
+      shuffleImages,
       updateSettings,
       setImageFocus,
     ],
