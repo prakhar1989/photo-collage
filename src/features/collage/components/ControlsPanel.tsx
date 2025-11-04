@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ComponentPropsWithoutRef } from 'react'
 
 import { useCollage } from '../CollageProvider'
 import { ASPECT_RATIOS } from '../settings'
@@ -6,8 +6,27 @@ import { COLLAGE_LAYOUTS, LAYOUT_OPTIONS } from '../layouts'
 
 const formatLabel = (value: number) => `${value}px`
 
+const ShuffleIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <polyline points="16 3 21 3 21 8" />
+    <line x1="4" y1="20" x2="21" y2="3" />
+    <polyline points="21 16 21 21 16 21" />
+    <line x1="15" y1="15" x2="21" y2="21" />
+    <line x1="4" y1="4" x2="9" y2="9" />
+  </svg>
+)
+
 export const ControlsPanel = () => {
-  const { settings, updateSettings } = useCollage()
+  const { images, settings, shuffleImages, updateSettings } = useCollage()
 
   const handleLayoutChange = (id: string) => {
     if (id === settings.layoutId) return
@@ -32,8 +51,25 @@ export const ControlsPanel = () => {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Layouts</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Choose a preset collage layout that fits your photos best.</p>
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Layouts</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Choose a preset collage layout that fits your photos best.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-slate-500 transition hover:border-slate-300 hover:text-slate-700 disabled:opacity-40 dark:border-border/60 dark:text-slate-300 dark:hover:border-slate-500"
+            onClick={shuffleImages}
+            disabled={images.length < 2}
+            aria-label="Randomize photo order"
+            title="Randomize photo order"
+          >
+            <ShuffleIcon className="h-4 w-4" />
+            <span className="sr-only">Randomize photo order</span>
+          </button>
+        </header>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {LAYOUT_OPTIONS.map((option) => {
             const isActive = option.id === settings.layoutId

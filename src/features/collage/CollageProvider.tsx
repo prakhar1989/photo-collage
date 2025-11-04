@@ -225,6 +225,23 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
     })
   }, [])
 
+  const shuffleImages = useCallback(() => {
+    setState((prev) => {
+      if (prev.images.length < 2) return prev
+
+      const next = [...prev.images]
+      for (let index = next.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1))
+        ;[next[index], next[swapIndex]] = [next[swapIndex], next[index]]
+      }
+
+      return {
+        ...prev,
+        images: next,
+      }
+    })
+  }, [])
+
   const updateSettings = useCallback((partial: Partial<CollageSettings>) => {
     setState((prev) => {
       const nextSettings = { ...prev.settings, ...partial }
@@ -282,6 +299,7 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
       removeImage,
       clearImages,
       reorderImages,
+      shuffleImages,
       updateSettings,
       setImageFocus,
     }),
@@ -293,6 +311,7 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
       removeImage,
       clearImages,
       reorderImages,
+      shuffleImages,
       updateSettings,
       setImageFocus,
     ],
