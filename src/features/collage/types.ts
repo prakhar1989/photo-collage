@@ -48,6 +48,9 @@ export interface CollageImage {
   width: number;
   height: number;
   imageBitmap?: ImageBitmap;
+  /** Normalized crop focus (0 = start, 1 = end) */
+  focusX: number;
+  focusY: number;
 }
 
 export interface CollageState {
@@ -63,4 +66,5 @@ export interface CollageContextValue extends CollageState {
   clearImages: () => void;
   reorderImages: (fromIndex: number, toIndex: number) => void;
   updateSettings: (partial: Partial<CollageSettings>) => void;
+  setImageFocus: (id: string, focus: { focusX?: number; focusY?: number }) => void;
 }

@@ -52,6 +52,8 @@ const prepareImage = async (file: File): Promise<CollageImage> => {
         width: imageBitmap.width,
         height: imageBitmap.height,
         imageBitmap,
+        focusX: 0.5,
+        focusY: 0.5,
       }
     }
 
@@ -62,6 +64,8 @@ const prepareImage = async (file: File): Promise<CollageImage> => {
       previewUrl,
       width: dimensions.width,
       height: dimensions.height,
+      focusX: 0.5,
+      focusY: 0.5,
     }
   } catch (error) {
     URL.revokeObjectURL(previewUrl)
@@ -75,6 +79,8 @@ const releaseImage = (image: CollageImage) => {
   }
   URL.revokeObjectURL(image.previewUrl)
 }
+
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
 
 const loadStoredSettings = (): CollageSettings => {
   if (typeof window === 'undefined') {
@@ -240,6 +246,33 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
     })
   }, [])
 
+  const setImageFocus = useCallback((id: string, focus: { focusX?: number; focusY?: number }) => {
+    if (focus.focusX === undefined && focus.focusY === undefined) return
+    setState((prev) => {
+      const index = prev.images.findIndex((image) => image.id === id)
+      if (index === -1) return prev
+
+      const nextImages = [...prev.images]
+      const target = nextImages[index]
+
+      const nextImage: CollageImage = {
+        ...target,
+        focusX: focus.focusX === undefined ? target.focusX : clamp01(focus.focusX),
+        focusY: focus.focusY === undefined ? target.focusY : clamp01(focus.focusY),
+      }
+
+      if (nextImage.focusX === target.focusX && nextImage.focusY === target.focusY) {
+        return prev
+      }
+
+      nextImages[index] = nextImage
+      return {
+        ...prev,
+        images: nextImages,
+      }
+    })
+  }, [])
+
   const value = useMemo<CollageContextValue>(
     () => ({
       ...state,
@@ -250,8 +283,19 @@ export const CollageProvider = ({ children }: CollageProviderProps) => {
       clearImages,
       reorderImages,
       updateSettings,
+      setImageFocus,
     }),
-    [state, layout, aspectRatio, addImages, removeImage, clearImages, reorderImages, updateSettings],
+    [
+      state,
+      layout,
+      aspectRatio,
+      addImages,
+      removeImage,
+      clearImages,
+      reorderImages,
+      updateSettings,
+      setImageFocus,
+    ],
   )
 
   return <CollageContext.Provider value={value}>{children}</CollageContext.Provider>

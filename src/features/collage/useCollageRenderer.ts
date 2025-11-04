@@ -48,12 +48,16 @@ const computeCoverCrop = (
   sourceHeight: number,
   targetWidth: number,
   targetHeight: number,
+  focusX = 0.5,
+  focusY = 0.5,
 ) => {
   const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight)
   const cropWidth = targetWidth / scale
   const cropHeight = targetHeight / scale
-  const sx = (sourceWidth - cropWidth) / 2
-  const sy = (sourceHeight - cropHeight) / 2
+  const maxOffsetX = Math.max(0, sourceWidth - cropWidth)
+  const maxOffsetY = Math.max(0, sourceHeight - cropHeight)
+  const sx = maxOffsetX * Math.min(1, Math.max(0, focusX))
+  const sy = maxOffsetY * Math.min(1, Math.max(0, focusY))
   return { sx, sy, sw: cropWidth, sh: cropHeight }
 }
 
@@ -191,7 +195,14 @@ export const useCollageRenderer = () => {
         const destX = Math.round(cell.x * width + gutter / 2)
         const destY = Math.round(cell.y * height + gutter / 2)
 
-        const { sx, sy, sw, sh } = computeCoverCrop(image.width, image.height, destWidth, destHeight)
+        const { sx, sy, sw, sh } = computeCoverCrop(
+          image.width,
+          image.height,
+          destWidth,
+          destHeight,
+          image.focusX,
+          image.focusY,
+        )
         const cropCanvas = createCanvas(Math.max(1, Math.round(sw)), Math.max(1, Math.round(sh)))
         const cropContext = cropCanvas.getContext('2d')
         if (!cropContext) continue
