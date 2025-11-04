@@ -123,13 +123,13 @@ export const PreviewStage = () => {
   return (
     <section className="space-y-4">
       <header>
-        <h2 className="text-lg font-semibold text-slate-900">Preview</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Preview</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Live view of your collage. Download or share once you’re happy with it.
         </p>
       </header>
 
-      <div className="rounded-3xl bg-surface p-6 shadow-panel ring-1 ring-border">
+      <div className="rounded-3xl bg-surface p-6 shadow-panel ring-1 ring-border transition-colors dark:ring-border/60">
         <div
           className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-2xl shadow-inner"
           style={{
@@ -145,7 +145,7 @@ export const PreviewStage = () => {
           {slots.map((slot, index) => (
             <figure
               key={slot.id}
-              className="absolute overflow-hidden bg-slate-100 shadow-md transition touch-none"
+              className="absolute overflow-hidden bg-slate-100 shadow-md transition touch-none dark:bg-slate-800"
               role={slot.source ? 'presentation' : undefined}
               style={{
                 ...slot.position,
@@ -174,8 +174,8 @@ export const PreviewStage = () => {
                   draggable={false}
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-100">
-                  <span className="text-xs font-medium text-slate-400">
+                <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-slate-800">
+                  <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
                     Slot {index + 1}
                   </span>
                 </div>
@@ -187,7 +187,7 @@ export const PreviewStage = () => {
         <div className="mt-6 flex flex-wrap gap-3">
           <button
             type="button"
-            className="flex-1 min-w-[160px] rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-panel transition hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-slate-300"
+            className="flex-1 min-w-[160px] rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-panel transition hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-600"
             onClick={download}
             disabled={images.length === 0 || isExporting}
           >
@@ -195,7 +195,7 @@ export const PreviewStage = () => {
           </button>
           <button
             type="button"
-            className="flex-1 min-w-[160px] rounded-full border border-border px-6 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+            className="flex-1 min-w-[160px] rounded-full border border-border px-6 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 dark:border-border/60 dark:text-slate-200 dark:hover:border-slate-500 dark:disabled:border-slate-700 dark:disabled:text-slate-600"
             onClick={share}
             disabled={images.length === 0 || isExporting}
           >
