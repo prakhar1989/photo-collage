@@ -14,6 +14,13 @@ type CachedSource = {
   dispose?: () => void
 }
 
+/**
+ * Creates an offscreen canvas element sized to the provided dimensions.
+ *
+ * @param width - The desired canvas width in CSS pixels.
+ * @param height - The desired canvas height in CSS pixels.
+ * @returns The configured offscreen canvas element sized in device pixels.
+ */
 const createCanvas = (width: number, height: number) => {
   const canvas = document.createElement('canvas')
   canvas.width = width
@@ -21,6 +28,16 @@ const createCanvas = (width: number, height: number) => {
   return canvas
 }
 
+/**
+ * Traces a rounded rectangle path on the supplied 2D canvas context.
+ *
+ * @param context - Canvas context used for drawing.
+ * @param x - The x-coordinate of the rectangle's top-left corner.
+ * @param y - The y-coordinate of the rectangle's top-left corner.
+ * @param width - Rectangle width in pixels.
+ * @param height - Rectangle height in pixels.
+ * @param radius - Desired corner radius; clamped to the rectangle bounds.
+ */
 const roundedRect = (
   context: CanvasRenderingContext2D,
   x: number,
@@ -43,6 +60,17 @@ const roundedRect = (
   context.closePath()
 }
 
+/**
+ * Calculates the source rectangle needed to cover a target aspect ratio when drawing an image.
+ *
+ * @param sourceWidth - Original image width.
+ * @param sourceHeight - Original image height.
+ * @param targetWidth - Target display width.
+ * @param targetHeight - Target display height.
+ * @param focusX - Optional horizontal focal point between 0 and 1.
+ * @param focusY - Optional vertical focal point between 0 and 1.
+ * @returns The crop rectangle describing the portion of the source image to sample.
+ */
 const computeCoverCrop = (
   sourceWidth: number,
   sourceHeight: number,
@@ -61,9 +89,23 @@ const computeCoverCrop = (
   return { sx, sy, sw: cropWidth, sh: cropHeight }
 }
 
+/**
+ * Encodes the given canvas element into a Blob using the provided mime type and quality.
+ *
+ * @param canvas - Canvas to serialize.
+ * @param mime - MIME type of the resulting blob.
+ * @param quality - Optional encoder-specific quality parameter.
+ * @returns A promise resolving to the encoded blob, or `null` if encoding failed.
+ */
 const canvasToBlob = (canvas: HTMLCanvasElement, mime: string, quality?: number) =>
   new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mime, quality))
 
+/**
+ * Loads an HTMLImageElement from the supplied source URL.
+ *
+ * @param src - Image source URL.
+ * @returns A promise that resolves once the element has finished loading.
+ */
 const loadImageElement = (src: string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image()
@@ -72,6 +114,12 @@ const loadImageElement = (src: string) =>
     img.src = src
   })
 
+/**
+ * Persists a blob to disk by synthesizing a temporary anchor element.
+ *
+ * @param blob - Blob to save.
+ * @param filename - Suggested filename for the download.
+ */
 const saveBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -85,6 +133,11 @@ const saveBlob = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url)
 }
 
+/**
+ * Provides rendering utilities for the collage preview canvas including export helpers.
+ *
+ * @returns Refs and callbacks for rendering, exporting, and sharing the collage image.
+ */
 export const useCollageRenderer = () => {
   const { aspectRatio, images, layout, settings } = useCollage()
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -119,6 +172,11 @@ export const useCollageRenderer = () => {
     }
   }, [images])
 
+  /**
+   * Lazily instantiates and caches the shared pica instance used for high-quality resizing.
+   *
+   * @returns The shared `pica` instance used for canvas scaling.
+   */
   const ensurePica = useCallback((): PicaInstance => {
     if (!picaRef.current) {
       picaRef.current = pica()
@@ -126,6 +184,12 @@ export const useCollageRenderer = () => {
     return picaRef.current
   }, [])
 
+  /**
+   * Retrieves a renderable source for the provided collage image, preferring cached bitmaps.
+   *
+   * @param image - Collage image whose bitmap or preview should be loaded.
+   * @returns A cached `CanvasImageSource` ready for drawing.
+   */
   const getSource = useCallback(async (image: CollageImage): Promise<CanvasImageSource> => {
     const cache = cacheRef.current
     const cached = cache.get(image.id)
@@ -154,6 +218,12 @@ export const useCollageRenderer = () => {
     return element
   }, [])
 
+  /**
+   * Draws the current collage configuration onto the backing canvas, respecting abort signals.
+   *
+   * @param signal - Optional abort controller signal for cancelling long-running renders.
+   * @returns A promise that resolves once rendering is complete or cancelled.
+   */
   const renderCollage = useCallback(
     async (signal?: AbortSignal) => {
       const canvas = canvasRef.current
@@ -261,6 +331,11 @@ export const useCollageRenderer = () => {
     return () => controller.abort()
   }, [renderCollage])
 
+  /**
+   * Renders the collage and encodes the result as a JPEG blob.
+   *
+   * @returns A promise containing the encoded JPEG blob, or `null` if encoding fails.
+   */
   const generateBlob = useCallback(async () => {
     const canvas = canvasRef.current
     if (!canvas) return null
@@ -268,6 +343,11 @@ export const useCollageRenderer = () => {
     return canvasToBlob(canvas, 'image/jpeg', JPEG_QUALITY)
   }, [renderCollage])
 
+  /**
+   * Exports the collage to disk, showing fallback errors in the console if encoding fails.
+   *
+   * @returns A promise that resolves when the download workflow completes.
+   */
   const download = useCallback(async () => {
     if (!canvasRef.current || images.length === 0) return
     setIsExporting(true)
@@ -285,6 +365,11 @@ export const useCollageRenderer = () => {
     }
   }, [generateBlob, images.length, settings.aspectRatioId])
 
+  /**
+   * Shares the collage image using the Web Share API, with download fallbacks when unsupported.
+   *
+   * @returns A promise that resolves when the share or fallback download finishes.
+   */
   const share = useCallback(async () => {
     if (!canvasRef.current || images.length === 0) return
     setIsExporting(true)
